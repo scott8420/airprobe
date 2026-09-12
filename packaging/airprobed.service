@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Scott Combs
+# systemd user unit for airprobed.
+#
+# Install:
+#   mkdir -p ~/.config/systemd/user ~/.config/airprobe
+#   cp packaging/airprobed.service ~/.config/systemd/user/
+#   cp packaging/io.github.scott8420.Airprobe.service \
+#      ~/.local/share/dbus-1/services/
+#   echo 'AIRPROBE_MAC=AA:BB:CC:DD:EE:FF' > ~/.config/airprobe/airprobed.conf
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now airprobed
+#
+# Logs: journalctl --user -u airprobed -f
+#
+# WHY THE MAC LIVES IN AN ENVIRONMENT FILE. A D-Bus-activated service is
+# started by the bus, not by a terminal, so there is nobody to type argv. The
+# alternatives were a config parser in the daemon (a file format to design and
+# document for exactly one value) or a hardcoded address (absurd). One
+# EnvironmentFile line is the smallest thing that works, and systemctl --user
+# edit is a perfectly good editor for it.
+
+[Unit]
+Description=Airprobe AirPods daemon
+Documentation=https://github.com/librepods-org/librepods
+
+# The daemon does not require bluetooth to be up: it watches BlueZ and waits.
+# Starting before bluetoothd is fine and the name watch handles the rest, so
+# this is a Wants rather than a Requires -- a hard dependency would make the
+# daemon fail to start on a machine with bluetooth disabled, which is exactly
+# the machine where it should sit quietly instead.
+Wants=bluetooth.target
+After=bluetooth.target
+
+[Service]
+Type=dbus
+BusName=io.github.scott8420.Airprobe
+
+EnvironmentFile=%h/.config/airprobe/airprobed.conf
+ExecStart=%h/.local/bin/airprobed
+
+# on-failure, not always. A clean exit means SIGTERM was delivered and the
+# channel was released on purpose; restarting after that would fight
+# `systemctl --user stop`.
+Restart=on-failure
+RestartSec=5
+
+# The AAP channel is an ordinary L2CAP socket to a paired device. It needs no
+# elevated privilege when the user is in the bluetooth group; see build.sh for
+# the setcap alternative.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectControlGroups=true
+ProtectKernelModules=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=default.target

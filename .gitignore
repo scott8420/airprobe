@@ -1,0 +1,8 @@
+build/
+compile_commands.json
+*.o
+*.zip
+.cache/
+
+# captures carry device addresses -- never commit them
+*.cap

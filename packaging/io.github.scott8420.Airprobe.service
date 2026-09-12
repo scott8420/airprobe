@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Scott Combs
+# D-Bus session activation. Goes in ~/.local/share/dbus-1/services/
+#
+# This makes the bus start airprobed on first use rather than requiring it to
+# be enabled at login. The two are not exclusive -- `systemctl --user enable`
+# starts it at login, this starts it on demand, and SystemdService= means both
+# routes converge on the same unit instead of racing to own the name.
+[D-BUS Service]
+Name=io.github.scott8420.Airprobe
+Exec=/bin/false
+SystemdService=airprobed.service

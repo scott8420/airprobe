@@ -1,0 +1,7 @@
+{
+  "uuid": "airprobe@scott8420.github.io",
+  "name": "Airprobe",
+  "description": "Shows the battery level of connected Apple wireless earbuds in Quick Settings, read from the airprobed daemon on the session bus. Does no Bluetooth work of its own.",
+  "shell-version": ["50"],
+  "version": 1
+}
