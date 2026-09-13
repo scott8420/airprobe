@@ -12,10 +12,20 @@ hears on the session bus, and hands a single figure to BlueZ so the reading
 shows up in GNOME Settings with no UI of its own. A Quick Settings tile shows
 the two earbuds separately.
 
-```
-[icon]  AirPods
-        L 86% · R 83%
-```
+![The Quick Settings tile, showing both earbuds](assets/screenshots/quick-settings.png)
+
+![GNOME Settings, Power, showing the AirPods row](assets/screenshots/settings-power.png)
+
+The two figures differ on purpose. The tile shows each earbud, because that is
+what you want to know before a call. Settings shows the lower of the two,
+because `org.bluez.Battery1` carries a single byte per device — there is no
+shape in which three components reach it — and the lower figure is the honest
+one to reduce them to. A full case beside two flat earbuds would read 100% and
+tell you nothing useful.
+
+(The numbers also drift between the two shots because they were taken minutes
+apart and a battery in use goes down. Sampling layers of a stack minutes apart
+is how a time series starts impersonating a bug.)
 
 ## What it is
 
